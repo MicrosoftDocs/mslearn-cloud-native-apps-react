@@ -17,6 +17,6 @@ export default function Home({ socketServerUrl }) {
     </div>
   );
 }
-export async function getStaticProps() {
+export async function getServerSideProps() {
   return { props: { socketServerUrl: process.env.SOCKET_SERVER_URL } };
 }

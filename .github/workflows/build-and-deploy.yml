@@ -27,8 +27,26 @@ jobs:
         with:
           node-version: "14"
 
-      - run: npm install
-      - run: npm run build
+      - name: "npm install, build, and test"
+        run: |
+          npm install
+          npm run build --if-present
+          npm run test --if-present
+        working-directory: ./src
+
+      - name: "npm install, build, and test"
+        run: |
+          cp -R ./.next ${{env.GITHUB_WORKSPACE}}/output
+          cp ./package.json ${{env.GITHUB_WORKSPACE}}/output
+          cp -R ./public ${{env.GITHUB_WORKSPACE}}/output
+          cp -R ./node_modules ${{env.GITHUB_WORKSPACE}}/output
+        working-directory: ${{env.GITHUB_WORKSPACE}}/src
+
+      - name: "npm install, build, and test"
+        run: |
+          npm install
+          npm run build --if-present
+        working-directory: ${{env.GITHUB_WORKSPACE}}/src
 
       - name: Deploy to staging slot
         if: success() && github.event_name == 'pull_request'
@@ -37,7 +55,7 @@ jobs:
           app-name: ${{env.AZURE_APP_NAME}}
           slot-name: "staging"
           publish-profile: ${{ secrets.AzureAppService_Staging }}
-          package: ${{env.GITHUB_WORKSPACE}}
+          package: ${{env.GITHUB_WORKSPACE}}/output
 
       - name: Deploy to production slot
         if: success() && github.event_name != 'pull_request'
@@ -46,12 +64,12 @@ jobs:
           app-name: ${{env.AZURE_APP_NAME}}
           slot-name: "production"
           publish-profile: ${{ secrets.AzureAppService_Production }}
-          package: ${{env.GITHUB_WORKSPACE}}
+          package: ${{env.GITHUB_WORKSPACE}}/output
 
       - name: Zip output
         if: success()
-        working-directory: ${{env.GITHUB_WORKSPACE}}
-        run: sudo zip -r ${{ github.workspace }}/${{env.OUTPUT_NAME}}.zip .
+        working-directory: ${{env.GITHUB_WORKSPACE}}/output
+        run: sudo zip -r ${{github.workspace}}/${{env.OUTPUT_NAME}}.zip .
 
       - name: Deploy artifact to staging storage container
         if: success() && github.event_name == 'pull_request'
