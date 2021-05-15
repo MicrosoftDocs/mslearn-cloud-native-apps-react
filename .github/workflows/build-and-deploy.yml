@@ -1,0 +1,74 @@
+# Docs for the Azure Web Apps Deploy action: https://github.com/Azure/webapps-deploy
+# More GitHub Actions for Azure: https://github.com/Azure/actions
+
+name: Cloud Native Apps - Build and deploy
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+env:
+  OUTPUT_NAME: CloudNativeAppsUI
+  AZURE_STORAGE_CONTAINER_NAME_PRODUCTION: build-artifacts
+  AZURE_STORAGE_CONTAINER_NAME_STAGING: build-artifacts-staging
+  AZURE_APP_NAME: mslearn-cloud-native-app-react
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v2
+        with:
+          node-version: "14"
+
+      - run: npm install
+      - run: npm run build
+
+      - name: Deploy to staging slot
+        if: success() && github.event_name == 'pull_request'
+        uses: azure/webapps-deploy@v2
+        with:
+          app-name: ${{env.AZURE_APP_NAME}}
+          slot-name: "staging"
+          publish-profile: ${{ secrets.AzureAppService_Staging }}
+          package: ${{env.GITHUB_WORKSPACE}}
+
+      - name: Deploy to production slot
+        if: success() && github.event_name != 'pull_request'
+        uses: azure/webapps-deploy@v2
+        with:
+          app-name: ${{env.AZURE_APP_NAME}}
+          slot-name: "production"
+          publish-profile: ${{ secrets.AzureAppService_Production }}
+          package: ${{env.GITHUB_WORKSPACE}}
+
+      - name: Zip output
+        if: success()
+        working-directory: ${{env.GITHUB_WORKSPACE}}
+        run: sudo zip -r ${{ github.workspace }}/${{env.OUTPUT_NAME}}.zip .
+
+      - name: Deploy artifact to staging storage container
+        if: success() && github.event_name == 'pull_request'
+        uses: bacongobbler/azure-blob-storage-upload@v1.1.1
+        with:
+          source_dir: ${{ github.workspace }}
+          sync: false
+          container_name: ${{env.AZURE_STORAGE_CONTAINER_NAME_STAGING}}
+          connection_string: ${{ secrets.ARTIFACTS_AZURE_STORAGE_CONNECTION_STRING }}
+          extra_args: "--pattern ${{env.OUTPUT_NAME}}.zip"
+
+      - name: Deploy artifact to production storage container
+        if: success() && github.event_name != 'pull_request'
+        uses: bacongobbler/azure-blob-storage-upload@v1.1.1
+        with:
+          source_dir: ${{ github.workspace }}
+          sync: false
+          container_name: ${{env.AZURE_STORAGE_CONTAINER_NAME_PRODUCTION}}
+          connection_string: ${{ secrets.ARTIFACTS_AZURE_STORAGE_CONNECTION_STRING }}
+          extra_args: "--pattern ${{env.OUTPUT_NAME}}.zip"
