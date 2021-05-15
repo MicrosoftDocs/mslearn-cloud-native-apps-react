@@ -37,10 +37,10 @@ jobs:
 
       - name: Copy deploy artifacts to output folder
         run: |
-          cp -R ./.next ${{env.GITHUB_WORKSPACE}}/output
-          cp ./package.json ${{env.GITHUB_WORKSPACE}}/output
-          cp -R ./public ${{env.GITHUB_WORKSPACE}}/output
-          cp -R ./node_modules ${{env.GITHUB_WORKSPACE}}/output
+          sudo cp -R ./.next ${{env.GITHUB_WORKSPACE}}/output
+          sudo cp ./package.json ${{env.GITHUB_WORKSPACE}}/output
+          sudo cp -R ./public ${{env.GITHUB_WORKSPACE}}/output
+          sudo cp -R ./node_modules ${{env.GITHUB_WORKSPACE}}/output
         working-directory: src
 
       - name: Deploy to staging slot
