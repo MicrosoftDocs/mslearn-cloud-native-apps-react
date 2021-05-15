@@ -37,7 +37,7 @@ jobs:
         working-directory: src
 
       - name: Copy deploy artifacts to output folder
-        run: sudo bash ${{env.GITHUB_WORKSPACE}}/scripts/copyToOutput.sh ${{env.GITHUB_WORKSPACE}}/src ${{env.GITHUB_WORKSPACE}}/output
+        run: sudo bash ${{github.workspace}}/scripts/copyToOutput.sh ${{github.workspace}}/src ${{github.workspace}}/output
         working-directory: src
 
       - name: Deploy to staging slot
