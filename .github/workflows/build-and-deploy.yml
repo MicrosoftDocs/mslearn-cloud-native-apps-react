@@ -36,10 +36,6 @@ jobs:
         run: npm run build
         working-directory: src
 
-      - name: Copy deploy artifacts to output folder
-        run: sudo bash ${{ github.workspace }}/scripts/copyToOutput.sh ${{ github.workspace }}/src ${{ github.workspace }}/output
-        working-directory: src
-
       - name: Deploy to staging slot
         if: success() && github.event_name == 'pull_request'
         uses: azure/webapps-deploy@v2
@@ -47,7 +43,7 @@ jobs:
           app-name: ${{env.AZURE_APP_NAME}}
           slot-name: "staging"
           publish-profile: ${{ secrets.AzureAppService_Staging }}
-          package: ${{ github.workspace }}/output
+          package: ${{ github.workspace }}
 
       - name: Deploy to production slot
         if: success() && github.event_name != 'pull_request'
@@ -56,11 +52,11 @@ jobs:
           app-name: ${{env.AZURE_APP_NAME}}
           slot-name: "production"
           publish-profile: ${{ secrets.AzureAppService_Production }}
-          package: ${{ github.workspace }}/output
+          package: ${{ github.workspace }}
 
       - name: Zip prod output
         if: success() && github.event_name != 'pull_request'
-        working-directory: ${{ github.workspace }}/output
+        working-directory: ${{ github.workspace }}
         run: |
           mkdir -p ${{ github.workspace }}/build-artifacts/prod/
           sudo zip -FS -r ${{ github.workspace }}/build-artifacts/prod/${{env.OUTPUT_NAME}}.zip .
