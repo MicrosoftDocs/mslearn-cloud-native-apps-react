@@ -27,25 +27,20 @@ jobs:
         with:
           node-version: "14"
 
-      - name: "npm install, build, and test"
-        run: |
-          npm install
-          npm run build --if-present
-          npm run test --if-present
-        working-directory: ./src
+      - name: Install npm dependencies
+        run: npm install
+        working-directory: ${{env.GITHUB_WORKSPACE}}/src
 
-      - name: "npm install, build, and test"
+      - name: Build app
+        run: npm run build
+        working-directory: ${{env.GITHUB_WORKSPACE}}/src
+
+      - name: Copy deploy artifacts to output folder
         run: |
           cp -R ./.next ${{env.GITHUB_WORKSPACE}}/output
           cp ./package.json ${{env.GITHUB_WORKSPACE}}/output
           cp -R ./public ${{env.GITHUB_WORKSPACE}}/output
           cp -R ./node_modules ${{env.GITHUB_WORKSPACE}}/output
-        working-directory: ${{env.GITHUB_WORKSPACE}}/src
-
-      - name: "npm install, build, and test"
-        run: |
-          npm install
-          npm run build --if-present
         working-directory: ${{env.GITHUB_WORKSPACE}}/src
 
       - name: Deploy to staging slot
