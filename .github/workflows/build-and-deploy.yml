@@ -29,11 +29,11 @@ jobs:
 
       - name: Install npm dependencies
         run: npm install
-        working-directory: ${{env.GITHUB_WORKSPACE}}/src
+        working-directory: /src
 
       - name: Build app
         run: npm run build
-        working-directory: ${{env.GITHUB_WORKSPACE}}/src
+        working-directory: /src
 
       - name: Copy deploy artifacts to output folder
         run: |
@@ -41,7 +41,7 @@ jobs:
           cp ./package.json ${{env.GITHUB_WORKSPACE}}/output
           cp -R ./public ${{env.GITHUB_WORKSPACE}}/output
           cp -R ./node_modules ${{env.GITHUB_WORKSPACE}}/output
-        working-directory: ${{env.GITHUB_WORKSPACE}}/src
+        working-directory: /src
 
       - name: Deploy to staging slot
         if: success() && github.event_name == 'pull_request'
@@ -63,7 +63,7 @@ jobs:
 
       - name: Zip output
         if: success()
-        working-directory: ${{env.GITHUB_WORKSPACE}}/output
+        working-directory: /output
         run: sudo zip -r ${{github.workspace}}/${{env.OUTPUT_NAME}}.zip .
 
       - name: Deploy artifact to staging storage container
