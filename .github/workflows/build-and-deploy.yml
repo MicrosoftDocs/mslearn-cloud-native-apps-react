@@ -14,8 +14,6 @@ on:
 env:
   NODE_VERSION: "14.x"
   OUTPUT_NAME: CloudNativeAppsUI
-  AZURE_STORAGE_CONTAINER_NAME_PRODUCTION: build-artifacts
-  AZURE_STORAGE_CONTAINER_NAME_STAGING: build-artifacts-staging
   AZURE_APP_NAME: mslearn-cloud-native-app-react
 
 jobs:
