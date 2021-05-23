@@ -5,8 +5,6 @@ services:
     image: cna-express # run docker build . -t cna-express in the /src folder of the repo https://github.com/MicrosoftDocs/mslearn-cloud-native-apps-express
     ports:
       - "4000:4000"
-    environment:
-      - POSTGRES_DB=postgres
   web:
     build: .
     ports:
