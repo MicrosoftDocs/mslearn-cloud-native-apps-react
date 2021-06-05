@@ -13,7 +13,7 @@ export const useEventStream = (socketServerUrl) => {
     });
 
     socketRef.current.on(NEW_EVENT_MESSAGE_ID, (message) => {
-      setMessages((messages) => [...messages, message]);
+      setMessages((messages) => [message, ...messages]);
     });
 
     return () => {
